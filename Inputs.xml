@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<ArrayOfInputKey xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <InputKey>
+    <InputName>LeftSide</InputName>
+    <InputKeyCode>Q</InputKeyCode>
+  </InputKey>
+  <InputKey>
+    <InputName>RightSide</InputName>
+    <InputKeyCode>E</InputKeyCode>
+  </InputKey>
+  <InputKey>
+    <InputName>Forwards</InputName>
+    <InputKeyCode>W</InputKeyCode>
+  </InputKey>
+  <InputKey>
+    <InputName>Backwards</InputName>
+    <InputKeyCode>S</InputKeyCode>
+  </InputKey>
+  <InputKey>
+    <InputName>Fire</InputName>
+    <InputKeyCode>Space</InputKeyCode>
+  </InputKey>
+</ArrayOfInputKey>
