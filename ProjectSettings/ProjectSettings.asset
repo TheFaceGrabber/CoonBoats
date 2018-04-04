@@ -13,7 +13,7 @@ PlayerSettings:
   accelerometerFrequency: 60
   companyName: DefaultCompany
   productName: PirateGame
-  defaultCursor: {fileID: 2800000, guid: 42f0831f23f84ac41b5a1a5035bf3be0, type: 3}
+  defaultCursor: {fileID: 2800000, guid: 6ec665c0fb4b7204f9b9c927899aa9a8, type: 3}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
   m_ShowUnitySplashScreen: 1

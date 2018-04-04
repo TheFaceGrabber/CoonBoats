@@ -401,8 +401,7 @@ MonoBehaviour:
   Projectile: {fileID: 50998795897200508, guid: e8c030d6088a1ed4082125ce5a71674e,
     type: 2}
   ProjectileForce: 10
-  CannonPoints:
-  - {fileID: 0}
+  CannonPoints: []
   soundEffect: {fileID: 8300000, guid: f47271ffcf4390b419bc08ce21ae2200, type: 3}
   minSoundDelay: 0.1
   maxSoundDelay: 0.15
