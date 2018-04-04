@@ -1,59 +1,49 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 
 public class ProceduralTest : MonoBehaviour
 {
     public GameObject Land;
-
-    public int w = 100;
-    public int h = 100;
-
-    public int LoadDistance = 12;
-
+    public Material LandMaterial;
     public List<Region> Regions = new List<Region>();
-
-    [SerializeField] private List<Chunk> _chunks = new List<Chunk>();
-
-    public float Scale;
-
     public int Octaves = 2;
-
     public float Persistance;
-
     public float Lacunarity;
+    public float Scale;
+    public int ChunkSize = 40;
 
-    public Vector2 Location;
+    public static Vector2 ZeroOffset = new Vector2(1997,2018);
 
-    [SerializeField]
-    private bool _generate = true;
+    public static Vector2 ViewerPosition;
+    public static float ViewDistance = 40;
 
-    private Vector2 _lastPos;
-
-    private float _lastScale;
-
-    private Vector2 _nextChunkPos = new Vector2(0,-0.5f);
+    [SerializeField] private Dictionary<Vector2,Chunk> _chunks = new Dictionary<Vector2, Chunk>();
+    private List<Chunk> _chunksvisiblelastUpdate = new List<Chunk>();
+    private int ChunkViewDist;
     // Use this for initialization
     void Start ()
-	{
-	}
+    {
+        ChunkViewDist = Mathf.RoundToInt(ViewDistance / ChunkSize);
+    }
 	
 	// Update is called once per frame
 	void Update ()
 	{
-	    GenerateSurroundingChunks();
-	    DestroySurroundingChunks();
+	    ViewerPosition = new Vector2(transform.position.x, transform.position.y);
+        UpdateVisibleChunks();
+	    //DestroySurroundingChunks();
 	}
 
-    IEnumerator GenerateChunk()
+    Color[] GenerateTerrain(Vector2 Pos)
     {
-        Chunk c = new Chunk();
-        c.ChunkPos = _nextChunkPos;
-        for (int i = 0; i < w; i++)
+        Color[] cols = new Color[ChunkSize * ChunkSize];
+        for (int i = 0; i < ChunkSize; i++)
         {
-            for (int j = 0; j < h; j++)
+            for (int j = 0; j < ChunkSize; j++)
             {
                 float amp = 1;
                 float freq = 1;
@@ -61,93 +51,58 @@ public class ProceduralTest : MonoBehaviour
 
                 for (int k = 0; k < Octaves; k++)
                 {
-                    float xCoord = (i + _nextChunkPos.x) / Scale * freq;
-                    float yCoord = (j + _nextChunkPos.y) / Scale * freq;
+                    float xCoord = (i + Pos.x + ZeroOffset.x) / Scale * freq;// + Pos.x;
+                    float yCoord = (j + Pos.y + ZeroOffset.y) / Scale * freq;
+                    // + Pos.y;
                     float p = Mathf.PerlinNoise(xCoord, yCoord) * 2 - 1;
                     n += p * amp;
 
                     amp *= Persistance;
                     freq *= Lacunarity;
-
                 }
 
-                if (n > 0f)
+                for (int k = 0; k < Regions.Count; k++)
                 {
-                    GameObject go = Instantiate(Land, new Vector2(i - (w / 2) + _nextChunkPos.x, j - (h / 2) + _nextChunkPos.y), Quaternion.identity);
-                    c.Blocks.Add(go);
-                    //if(n < 1f)
-                    for (int k = 0; k < Regions.Count; k++)
-                    {
-                        if (n > Regions[k].Height)
-                            go.GetComponent<SpriteRenderer>().color = Regions[k].Colour;
-                    }
+                    if (n > Regions[k].Height)
+                        cols[j * ChunkSize + i] = Regions[k].Colour;
+                }
+
+            }
+        }
+
+        return cols;
+    }
+
+    void UpdateVisibleChunks()
+    {
+        for (int i = 0; i < _chunksvisiblelastUpdate.Count; i++)
+        {
+            _chunksvisiblelastUpdate[i].Go.SetActive(false);
+        }
+        _chunksvisiblelastUpdate.Clear();
+
+        int X = Mathf.RoundToInt(ViewerPosition.x / ChunkSize);
+        int Y = Mathf.RoundToInt(ViewerPosition.y / ChunkSize);
+
+        for (int yOffset = -ChunkViewDist; yOffset <= ChunkViewDist; yOffset++)
+        {
+            for (int xOffset = -ChunkViewDist; xOffset <= ChunkViewDist; xOffset++)
+            {
+                Vector2 viewedChunk = new Vector2(X + xOffset, Y + yOffset);
+                if (_chunks.ContainsKey(viewedChunk))
+                {
+                    _chunks[viewedChunk].Update();
+                    if(_chunks[viewedChunk].isVisible())
+                        _chunksvisiblelastUpdate.Add(_chunks[viewedChunk]);
+                }
+                else
+                {
+                    _chunks.Add(viewedChunk, new Chunk(GenerateTerrain(viewedChunk*ChunkSize),ChunkSize,viewedChunk, LandMaterial));
                 }
             }
         }
-
-        _chunks.Add(c);
-        yield return new WaitForEndOfFrame();
     }
-
-    void GenerateSurroundingChunks()
-    {
-        int X = (int)transform.position.x;
-        int Y = (int)transform.position.y;
-
-        for (int i = X - w; i < X + w; i+= w)
-        {
-            for (int j = Y - w; j < Y + w; j += w)
-            {
-                CreateChunk(i, j);
-            }
-        }
-    }
-
-    void CreateChunk(int x, int y)
-    {
-        float xPos = Mathf.FloorToInt((float)x / (float)w) * w;
-        float yPos = Mathf.FloorToInt((float)y / (float)w) * w;
-
-        Vector2 nextPos = new Vector2(x, y);
-
-        if (!HasChunkAtPos(nextPos))
-        {
-            _nextChunkPos = nextPos;
-            StartCoroutine(GenerateChunk());
-        }
-    }
-
-    void DestroySurroundingChunks()
-    {
-        for (int i = 0; i < _chunks.Count; i++)
-        {
-            float dist = Vector2.Distance(_chunks[i].ChunkPos, transform.position);
-            if (dist > LoadDistance)
-            {
-                DestroyChunk(_chunks[i]);
-            }
-        }
-    }
-
-    void DestroyChunk(Chunk c)
-    {
-        for (int i = 0; i < c.Blocks.Count; i++)
-        {
-            Destroy(c.Blocks[i]);
-        }
-
-        _chunks.Remove(c);
-    }
-
-    bool HasChunkAtPos(Vector2 pos)
-    {
-        for (int i = 0; i < _chunks.Count; i++)
-        {
-            if (_chunks[i].ChunkPos == pos)
-                return true;
-        }
-        return false;
-    }
+    
 }
 
 [System.Serializable]
@@ -161,6 +116,40 @@ public class Region
 [System.Serializable]
 public class Chunk
 {
-    public Vector2 ChunkPos;
-    public List<GameObject> Blocks = new List<GameObject>();
+    public int Size;
+    public Texture2D Texture;
+    public Vector2 Position;
+    public GameObject Go;
+    public Renderer ChunkRenderer;
+
+    private Bounds _bounds;
+
+    public Chunk(Color[] colours, int size, Vector2 posVector2, Material material)
+    {
+        Go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        Go.transform.localScale = Vector3.one * size;
+        Size = size;
+        Position = posVector2 * size;
+        Go.transform.position = Position;
+        _bounds = new Bounds(Position, Vector2.one * size);
+        Texture = new Texture2D(Size, Size) {filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp};
+        Texture.SetPixels(colours);
+        Texture.Apply();
+        ChunkRenderer = Go.GetComponent<Renderer>();
+        ChunkRenderer.material = material;
+        ChunkRenderer.material.mainTexture = Texture;
+        Go.SetActive(false);
+    }
+
+    public void Update()
+    {
+        float viewerDist = Mathf.Sqrt(_bounds.SqrDistance(ProceduralTest.ViewerPosition));
+        bool isVisible = viewerDist <= ProceduralTest.ViewDistance;
+        Go.SetActive(isVisible);
+    }
+
+    public bool isVisible()
+    {
+        return Go.activeSelf;
+    }
 }
