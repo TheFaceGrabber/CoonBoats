@@ -31,8 +31,8 @@ public class UserInput : MonoBehaviour {
     public static void ResetKeys()
     {
         AllKeys.Clear();
-        AllKeys.Add(new InputKey("LeftSide", KeyCode.Q));
-        AllKeys.Add(new InputKey("RightSide", KeyCode.E));
+        AllKeys.Add(new InputKey("Interact", KeyCode.E));
+        AllKeys.Add(new InputKey("ToggleCannonSide", KeyCode.T));
         AllKeys.Add(new InputKey("Forwards",KeyCode.W));
         AllKeys.Add(new InputKey("Backwards", KeyCode.S));
         AllKeys.Add(new InputKey("Fire", KeyCode.Space));
@@ -115,6 +115,12 @@ public class UserInput : MonoBehaviour {
         }
 
         return true;
+    }
+
+    public static string GetKeyForButton(string input)
+    {
+        InputKey inp = GetInputKey(input);
+        return inp.InputKeyCode.ToString();
     }
 }
 

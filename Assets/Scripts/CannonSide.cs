@@ -22,6 +22,8 @@ public class CannonSide : MonoBehaviour
     public Rigidbody2D Projectile;
     public float ProjectileForce;
 
+    public Rigidbody2D ShipRigidbody;
+
     public List<GameObject> CannonPoints = new List<GameObject>();
 
     public AudioClip soundEffect;
@@ -69,6 +71,7 @@ public class CannonSide : MonoBehaviour
         for (int i = 0; i < CannonPoints.Count; i++)
         {
             Rigidbody2D r = Instantiate<Rigidbody2D>(Projectile, CannonPoints[i].transform.position, CannonPoints[i].transform.rotation);
+            r.velocity = ShipRigidbody.velocity;
             r.AddForce(r.transform.up * ProjectileForce, ForceMode2D.Impulse);
             source.Play();
             yield return new WaitForSeconds(Random.Range(minSoundDelay, maxSoundDelay));

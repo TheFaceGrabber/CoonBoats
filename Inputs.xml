@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <ArrayOfInputKey xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <InputKey>
-    <InputName>LeftSide</InputName>
-    <InputKeyCode>Q</InputKeyCode>
+    <InputName>Interact</InputName>
+    <InputKeyCode>E</InputKeyCode>
   </InputKey>
   <InputKey>
-    <InputName>RightSide</InputName>
-    <InputKeyCode>E</InputKeyCode>
+    <InputName>ToggleCannonSide</InputName>
+    <InputKeyCode>T</InputKeyCode>
   </InputKey>
   <InputKey>
     <InputName>Forwards</InputName>
