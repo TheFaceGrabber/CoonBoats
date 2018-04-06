@@ -23,14 +23,16 @@ public class ShipController : MonoBehaviour
 
     public List<Transform> CollisionsTransforms = new List<Transform>();
 
-    private Vector2 lastUnBeachedPos;
-    private Vector2 lastUnBeachedPosMod;
+    private Vector2 _lastUnBeachedPos;
+    private Vector2 _lastUnBeachedPosMod;
     private bool _isUnbeaching;
-    private float _Unbeachspeed = 0.1f;
+    private float _Unbeachspeed = 0.05f;
 
     //Temporary
-    private bool showBeached;
+    private bool _showBeached;
+    private bool _isbeached;
 
+    private Transform _transform;
 
     // Use this for initialization
     void Start () {
@@ -45,59 +47,67 @@ public class ShipController : MonoBehaviour
         right.transform.localEulerAngles = Vector2.up;
         right.transform.localPosition = Vector2.zero;
         CannonPointsRight.Add(right);
-
+        _transform = transform;
         LeftSideCannon.CannonPoints = CannonPointsLeft;
         RightSideCannon.CannonPoints = CannonPointsRight;
+		RightSideCannon.isActived = true;
     }
 	
 	// Update is called once per frame
 	void Update ()
 	{
-	    if (!_isUnbeaching)
+	    CheckBeached();
+
+        if (!_isUnbeaching)
 	    {
 	        GetInput();
-	        mousePositionInWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-	        angle = (Mathf.Atan2(mousePositionInWorld.y - transform.position.y,
-	                     mousePositionInWorld.x - transform.position.x) * Mathf.Rad2Deg - 90);
+	        if (!_isbeached)
+	        {
+	            mousePositionInWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+	            angle = (Mathf.Atan2(mousePositionInWorld.y - _transform.position.y,
+	                         mousePositionInWorld.x - _transform.position.x) * Mathf.Rad2Deg - 90);
+	        }
 
-	        transform.rotation =
-	            Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, 0, angle), speedFector * Time.deltaTime);
-	        rb.AddRelativeForce(Vector2.up * (speed / 10));
+            _transform.rotation =
+	                Quaternion.Lerp(_transform.rotation, Quaternion.Euler(0, 0, angle), speedFector * Time.deltaTime);
+	            rb.AddRelativeForce(Vector2.up * (speed / 10));
 	    }
 	    else
 	    {
-	        Vector3 Dir = lastUnBeachedPosMod - new Vector2(transform.position.x, transform.position.y);
+	        Vector3 Dir = _lastUnBeachedPosMod - new Vector2(_transform.position.x, _transform.position.y);
 	        float angle = (Mathf.Atan2(Dir.y, Dir.x) * Mathf.Rad2Deg) - 90;
             Quaternion q = Quaternion.AngleAxis(angle,Vector3.forward);
-            transform.rotation = Quaternion.Slerp(transform.rotation,q, _Unbeachspeed/rb.mass);
-            transform.position = Vector3.Lerp(transform.position, lastUnBeachedPosMod, _Unbeachspeed / rb.mass);
+            _transform.rotation = Quaternion.Slerp(_transform.rotation,q, _Unbeachspeed/rb.mass);
+            _transform.position = Vector3.Lerp(_transform.position, _lastUnBeachedPosMod, _Unbeachspeed / rb.mass);
+	        if (Vector3.Distance(_transform.position, _lastUnBeachedPosMod) < 0.2f)
+	            _isUnbeaching = false;
 	    }
 	}
 
-    public bool IsBeached()
+    public void CheckBeached()
     {
         for (int i = 0; i < CollisionsTransforms.Count; i++)
         {
             if (ProceduralTest.Instance.CurrentChunk != null)
             {
-                float xDifference = Mathf.Abs(ProceduralTest.Instance.CurrentChunk.Position.x) - Mathf.Abs(transform.position.x);
-                float yDifference = Mathf.Abs(ProceduralTest.Instance.CurrentChunk.Position.y) - Mathf.Abs(transform.position.y);
+                float xDifference = Mathf.Abs(ProceduralTest.Instance.CurrentChunk.Position.x) - Mathf.Abs(CollisionsTransforms[i].position.x);
+                float yDifference = Mathf.Abs(ProceduralTest.Instance.CurrentChunk.Position.y) - Mathf.Abs(CollisionsTransforms[i].position.y);
                 int xPos = Mathf.RoundToInt(xDifference + (float)ProceduralTest.Instance.ChunkSize / 2);
                 int yPos = Mathf.RoundToInt(yDifference + (float)ProceduralTest.Instance.ChunkSize / 2);
                 if (ProceduralTest.Instance.CurrentChunk.Texture.GetPixel(xPos, yPos) != Color.clear)
-                    return true;
+                    _isbeached = true;
             }
         }
 
-        return false;
+        _isbeached = false;
     }
 
     private void GetInput()
     {
-        if (!IsBeached())
+        if (!_isbeached)
         {
-            showBeached = false;
-            lastUnBeachedPos = transform.position;
+            _showBeached = false;
+            _lastUnBeachedPos = _transform.position;
             if (UserInput.GetInput("Forwards"))
             {
                 speed += speed < 100 ? 1 : 0;
@@ -111,14 +121,14 @@ public class ShipController : MonoBehaviour
         else
         {
 
-            Vector2 dir = lastUnBeachedPos - new Vector2(transform.position.x, transform.position.y);
-            Vector2 pos = lastUnBeachedPos + dir * 2;
-            lastUnBeachedPosMod = pos;
+            Vector2 dir = _lastUnBeachedPos - new Vector2(_transform.position.x, _transform.position.y);
+            Vector2 pos = _lastUnBeachedPos + dir * 3;
+            _lastUnBeachedPosMod = pos;
             speed -= speed > 0 ? 5 : 0;
             if (speed <= 0)
-                showBeached = true;
+                _showBeached = true;
             else
-                showBeached = false;
+                _showBeached = false;
         }
 
         if (UserInput.GetInputDown("ToggleCannonSide"))
@@ -137,7 +147,7 @@ public class ShipController : MonoBehaviour
 
         if (UserInput.GetInputDown("Interact"))
         {
-            if (showBeached)
+            if (_showBeached)
             {
                 _isUnbeaching = true;
             }
@@ -152,7 +162,7 @@ public class ShipController : MonoBehaviour
 
     void OnGUI()
     {
-        if (showBeached)
+        if (_showBeached)
         {
             string text = "Press " + UserInput.GetKeyForButton("Interact") + " to un-beach your ship";
             float length = text.Length * 8;
