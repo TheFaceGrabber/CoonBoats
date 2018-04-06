@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class ShipController : MonoBehaviour
 {
-    Vector3 mousePositionInWorld;
-    float angle;
+    float Angle;
     [SerializeField]
-    private float speedFector = 2f;
+    private float speedFactor = 2f;
     [SerializeField]
-    private float speed;
+    private float Speed;
     
     private Rigidbody2D rb;
 
@@ -29,10 +28,9 @@ public class ShipController : MonoBehaviour
     private float _Unbeachspeed = 0.05f;
 
     //Temporary
-    private bool _showBeached;
     private bool _isbeached;
 
-    private Transform _transform;
+    public Transform Transform { get; set; }
 
     // Use this for initialization
     void Start () {
@@ -47,7 +45,7 @@ public class ShipController : MonoBehaviour
         right.transform.localEulerAngles = Vector2.up;
         right.transform.localPosition = Vector2.zero;
         CannonPointsRight.Add(right);
-        _transform = transform;
+        Transform = transform;
         LeftSideCannon.CannonPoints = CannonPointsLeft;
         RightSideCannon.CannonPoints = CannonPointsRight;
 		RightSideCannon.isActived = true;
@@ -57,32 +55,38 @@ public class ShipController : MonoBehaviour
 	void Update ()
 	{
 	    CheckBeached();
-
+        
         if (!_isUnbeaching)
 	    {
-	        GetInput();
+	        Transform.rotation =
+	                Quaternion.Lerp(Transform.rotation, Quaternion.Euler(0, 0, Angle), speedFactor * Time.deltaTime);
+	            rb.AddRelativeForce(Vector2.up * (Speed / 10));
+
 	        if (!_isbeached)
 	        {
-	            mousePositionInWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-	            angle = (Mathf.Atan2(mousePositionInWorld.y - _transform.position.y,
-	                         mousePositionInWorld.x - _transform.position.x) * Mathf.Rad2Deg - 90);
+	            _lastUnBeachedPos = Transform.position;
 	        }
+	        else
+	        {
 
-            _transform.rotation =
-	                Quaternion.Lerp(_transform.rotation, Quaternion.Euler(0, 0, angle), speedFector * Time.deltaTime);
-	            rb.AddRelativeForce(Vector2.up * (speed / 10));
-	    }
+	            Vector2 dir = _lastUnBeachedPos - new Vector2(Transform.position.x, Transform.position.y);
+	            Vector2 pos = _lastUnBeachedPos + dir * 3;
+	            _lastUnBeachedPosMod = pos;
+	            Speed -= Speed > 0 ? 5 : 0;
+	        }
+        }
 	    else
 	    {
-	        Vector3 Dir = _lastUnBeachedPosMod - new Vector2(_transform.position.x, _transform.position.y);
+	        Vector3 Dir = _lastUnBeachedPosMod - new Vector2(Transform.position.x, Transform.position.y);
 	        float angle = (Mathf.Atan2(Dir.y, Dir.x) * Mathf.Rad2Deg) - 90;
             Quaternion q = Quaternion.AngleAxis(angle,Vector3.forward);
-            _transform.rotation = Quaternion.Slerp(_transform.rotation,q, _Unbeachspeed/rb.mass);
-            _transform.position = Vector3.Lerp(_transform.position, _lastUnBeachedPosMod, _Unbeachspeed / rb.mass);
-	        if (Vector3.Distance(_transform.position, _lastUnBeachedPosMod) < 0.2f)
+	        Transform.rotation = Quaternion.Slerp(Transform.rotation,q, _Unbeachspeed/rb.mass);
+	        Transform.position = Vector3.Lerp(Transform.position, _lastUnBeachedPosMod, _Unbeachspeed / rb.mass);
+	        if (Vector3.Distance(Transform.position, _lastUnBeachedPosMod) < 0.2f)
 	            _isUnbeaching = false;
 	    }
-	}
+
+    }
 
     public void CheckBeached()
     {
@@ -95,78 +99,78 @@ public class ShipController : MonoBehaviour
                 int xPos = Mathf.RoundToInt(xDifference + (float)ProceduralTest.Instance.ChunkSize / 2);
                 int yPos = Mathf.RoundToInt(yDifference + (float)ProceduralTest.Instance.ChunkSize / 2);
                 if (ProceduralTest.Instance.CurrentChunk.Texture.GetPixel(xPos, yPos) != Color.clear)
+                {
                     _isbeached = true;
+                    return;
+                }
             }
         }
 
         _isbeached = false;
     }
-
-    private void GetInput()
+    
+    public void SetCannonSide(ECannonSide side)
     {
-        if (!_isbeached)
+        switch (side)
         {
-            _showBeached = false;
-            _lastUnBeachedPos = _transform.position;
-            if (UserInput.GetInput("Forwards"))
-            {
-                speed += speed < 100 ? 1 : 0;
-            }
-
-            if (UserInput.GetInput("Backwards"))
-            {
-                speed -= speed > 0 ? 1 : 0;
-            }
-        }
-        else
-        {
-
-            Vector2 dir = _lastUnBeachedPos - new Vector2(_transform.position.x, _transform.position.y);
-            Vector2 pos = _lastUnBeachedPos + dir * 3;
-            _lastUnBeachedPosMod = pos;
-            speed -= speed > 0 ? 5 : 0;
-            if (speed <= 0)
-                _showBeached = true;
-            else
-                _showBeached = false;
-        }
-
-        if (UserInput.GetInputDown("ToggleCannonSide"))
-        {
-            if (RightSideCannon.isActived)
-            {
+            case ECannonSide.Left:
                 RightSideCannon.isActived = false;
                 LeftSideCannon.isActived = true;
-            }
-            else if(LeftSideCannon.isActived)
-            {
+                break;
+            case ECannonSide.Right:
                 RightSideCannon.isActived = true;
                 LeftSideCannon.isActived = false;
-            }
-        }
-
-        if (UserInput.GetInputDown("Interact"))
-        {
-            if (_showBeached)
-            {
-                _isUnbeaching = true;
-            }
-        }
-
-        if (UserInput.GetInputDown("Fire"))
-        {
-            LeftSideCannon.Fire();
-            RightSideCannon.Fire();
+                break;
         }
     }
 
-    void OnGUI()
+    public void FireCannons()
     {
-        if (_showBeached)
-        {
-            string text = "Press " + UserInput.GetKeyForButton("Interact") + " to un-beach your ship";
-            float length = text.Length * 8;
-            GUI.Box(new Rect(Screen.width / 2 - (length / 2), Screen.height / 2 + 60, length, 30), text);
-        }
+        LeftSideCannon.Fire();
+        RightSideCannon.Fire();
+    }
+
+    public ECannonSide GetCannonSide()
+    {
+        if (RightSideCannon.isActived)
+            return ECannonSide.Right;
+        else
+            return ECannonSide.Left;
+    }
+
+    public void BeginUnBeaching()
+    {
+        _isUnbeaching = true;
+    }
+
+    public float GetSpeed()
+    {
+        return Speed;
+    }
+
+    public void SetSpeed(float speed)
+    {
+        this.Speed = speed;
+    }
+
+    public void AddSpeed(float add)
+    {
+        this.Speed += add;
+    }
+
+    public bool GetIsBeached()
+    {
+        return _isbeached;
+    }
+
+    public void SetAngle(float angle)
+    {
+        this.Angle = angle;
+    }
+
+    public enum ECannonSide
+    {
+        Left,
+        Right
     }
 }
