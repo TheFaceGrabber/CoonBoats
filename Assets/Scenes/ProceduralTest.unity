@@ -503,6 +503,7 @@ GameObject:
   - component: {fileID: 1236227889}
   - component: {fileID: 1236227888}
   - component: {fileID: 1236227887}
+  - component: {fileID: 1236227890}
   m_Layer: 0
   m_Name: Basic Ship
   m_TagString: Untagged
@@ -613,14 +614,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bef8b60b8669b84697554a78b833b5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speedFector: 2
-  speed: 2
+  speedFactor: 2
+  Speed: 0
   LeftSideCannon: {fileID: 551544721}
   RightSideCannon: {fileID: 838271075}
   CannonPointsLeft: []
   CannonPointsRight: []
   CollisionsTransforms:
   - {fileID: 69416381}
+--- !u!114 &1236227890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1236227886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b89d8fb2279b7fd42a07f755dddff5bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Ship: {fileID: 1236227889}
 --- !u!212 &1236227891
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -803,6 +816,7 @@ MonoBehaviour:
   Scale: 100
   ChunkSize: 20
   TextureMultiplier: 1
+  ChanceToSpawnShip: 0.1
   ViewDistanceMultiplier: 2
   CurrentChunkPos: {x: 0, y: 0}
 --- !u!114 &2140971444

@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class ProceduralTest : MonoBehaviour
+public class WorldGenerator : MonoBehaviour
 {
-    public static ProceduralTest Instance;
+    public static WorldGenerator Instance;
 
     public GameObject Land;
     public Material LandMaterial;
@@ -18,6 +19,9 @@ public class ProceduralTest : MonoBehaviour
     public float Scale;
     public int ChunkSize = 40;
     public int TextureMultiplier = 5;
+
+    [Range(0,100)]
+    public float ChanceToSpawnShip = 20;
 
     public Chunk CurrentChunk
     {
@@ -64,6 +68,24 @@ public class ProceduralTest : MonoBehaviour
 	    //DestroySurroundingChunks();
 	}
 
+    public void ShipSpawnPass(Vector2 coord)
+    {
+        float minX = coord.x - ChunkSize / 2f;
+        float minY = coord.y - ChunkSize / 2f;
+        float maxX = coord.x + ChunkSize / 2f;
+        float maxY = coord.y + ChunkSize / 2f;
+
+        float x = UnityEngine.Random.Range(minX, maxX);
+        float y = UnityEngine.Random.Range(minY, maxY);
+        int r = UnityEngine.Random.Range(1, 100);
+        if (r <= ChanceToSpawnShip)
+        {
+            Debug.Log("Spawned");
+            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            go.transform.position = new Vector3(x,y,1);
+        }
+    }
+
     Color[] GenerateTerrain(Vector2 Pos)
     {
         Color[] cols = new Color[(ChunkSize* TextureMultiplier) * (ChunkSize* TextureMultiplier)];
@@ -91,8 +113,11 @@ public class ProceduralTest : MonoBehaviour
                 {
                     if (n > Regions[k].Height)
                         cols[j * (ChunkSize * TextureMultiplier) + i] = Regions[k].Colour;
+
                 }
 
+                if(n < Regions[0].Height)
+                    ShipSpawnPass(Pos);
             }
         }
 
@@ -159,7 +184,7 @@ public class Chunk
     public Chunk(Color[] colours, int size, int textureMultipler,int distMultiplier, Vector2 posVector2, Material material, GameObject chunkObject)
     {
         _distMultiplier = distMultiplier;
-        Go = ProceduralTest.InstantiateChunk(chunkObject);
+        Go = WorldGenerator.InstantiateChunk(chunkObject);
         Go.transform.localScale = Vector3.one * size;
         Size = size;
         Position = posVector2 * size;
@@ -176,8 +201,8 @@ public class Chunk
 
     public void Update()
     {
-        float viewerDist = Mathf.Sqrt(_bounds.SqrDistance(ProceduralTest.ViewerPosition));
-        bool isVisible = viewerDist <= ProceduralTest.ViewDistance * _distMultiplier;
+        float viewerDist = Mathf.Sqrt(_bounds.SqrDistance(WorldGenerator.ViewerPosition));
+        bool isVisible = viewerDist <= WorldGenerator.ViewDistance * _distMultiplier;
         Go.SetActive(isVisible);
     }
 

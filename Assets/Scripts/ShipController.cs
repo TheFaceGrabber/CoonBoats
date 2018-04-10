@@ -92,13 +92,13 @@ public class ShipController : MonoBehaviour
     {
         for (int i = 0; i < CollisionsTransforms.Count; i++)
         {
-            if (ProceduralTest.Instance.CurrentChunk != null)
+            if (WorldGenerator.Instance.CurrentChunk != null)
             {
-                float xDifference = Mathf.Abs(ProceduralTest.Instance.CurrentChunk.Position.x) - Mathf.Abs(CollisionsTransforms[i].position.x);
-                float yDifference = Mathf.Abs(ProceduralTest.Instance.CurrentChunk.Position.y) - Mathf.Abs(CollisionsTransforms[i].position.y);
-                int xPos = Mathf.RoundToInt(xDifference + (float)ProceduralTest.Instance.ChunkSize / 2);
-                int yPos = Mathf.RoundToInt(yDifference + (float)ProceduralTest.Instance.ChunkSize / 2);
-                if (ProceduralTest.Instance.CurrentChunk.Texture.GetPixel(xPos, yPos) != Color.clear)
+                float xDifference = Mathf.Abs(WorldGenerator.Instance.CurrentChunk.Position.x) - Mathf.Abs(CollisionsTransforms[i].position.x);
+                float yDifference = Mathf.Abs(WorldGenerator.Instance.CurrentChunk.Position.y) - Mathf.Abs(CollisionsTransforms[i].position.y);
+                int xPos = Mathf.RoundToInt(xDifference + (float)WorldGenerator.Instance.ChunkSize / 2);
+                int yPos = Mathf.RoundToInt(yDifference + (float)WorldGenerator.Instance.ChunkSize / 2);
+                if (WorldGenerator.Instance.CurrentChunk.Texture.GetPixel(xPos, yPos) != Color.clear)
                 {
                     _isbeached = true;
                     return;
