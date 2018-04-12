@@ -141,6 +141,77 @@ Transform:
   m_Father: {fileID: 1236227892}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &311038451
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 311038453}
+  - component: {fileID: 311038452}
+  m_Layer: 0
+  m_Name: Generator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &311038452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 311038451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1456f29b66fccc04e81207c2f88f5628, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShipSpawnTest: {fileID: 1732669960402930, guid: 97d39630f94506c44b5b85e6747b9c6e,
+    type: 2}
+  Land: {fileID: 1010759422706086, guid: 467ade65866c6774d83737cfb2e9df03, type: 2}
+  LandMaterial: {fileID: 2100000, guid: 532161d484d99c043993e0d982a60569, type: 2}
+  Regions:
+  - Name: Sand
+    Colour: {r: 0.69411767, g: 0.654902, b: 0.5176471, a: 1}
+    Height: 0
+  - Name: Sand High
+    Colour: {r: 0.603, g: 0.5689322, b: 0.44969493, a: 1}
+    Height: 0.1
+  - Name: Grass
+    Colour: {r: 0.48235297, g: 0.50980395, b: 0.30588236, a: 1}
+    Height: 0.15
+  - Name: Grass Rock
+    Colour: {r: 0.4039216, g: 0.43529415, b: 0.2627451, a: 1}
+    Height: 0.35
+  - Name: Rock
+    Colour: {r: 0.35686275, g: 0.35686275, b: 0.35686275, a: 1}
+    Height: 0.55
+  - Name: Rock High
+    Colour: {r: 0.234, g: 0.234, b: 0.234, a: 1}
+    Height: 0.85
+  Octaves: 5
+  Persistance: 0.5
+  Lacunarity: 2
+  Scale: 100
+  ChunkSize: 20
+  TextureMultiplier: 1
+  ChanceToSpawnShip: 0.01
+  ViewDistanceMultiplier: 2
+--- !u!4 &311038453
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 311038451}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2140971442}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &551544720
 GameObject:
   m_ObjectHideFlags: 0
@@ -614,6 +685,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bef8b60b8669b84697554a78b833b5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShipLevel: 0
   speedFactor: 2
   Speed: 0
   LeftSideCannon: {fileID: 551544721}
@@ -705,7 +777,6 @@ GameObject:
   - component: {fileID: 2140971441}
   - component: {fileID: 2140971440}
   - component: {fileID: 2140971439}
-  - component: {fileID: 2140971443}
   - component: {fileID: 2140971444}
   - component: {fileID: 2140971445}
   m_Layer: 0
@@ -774,51 +845,11 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -157, y: -105, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 311038453}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2140971443
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2140971438}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1456f29b66fccc04e81207c2f88f5628, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Land: {fileID: 1010759422706086, guid: 467ade65866c6774d83737cfb2e9df03, type: 2}
-  LandMaterial: {fileID: 2100000, guid: 532161d484d99c043993e0d982a60569, type: 2}
-  Regions:
-  - Name: Sand
-    Colour: {r: 0.69411767, g: 0.654902, b: 0.5176471, a: 1}
-    Height: 0
-  - Name: Sand High
-    Colour: {r: 0.603, g: 0.5689322, b: 0.44969493, a: 1}
-    Height: 0.1
-  - Name: Grass
-    Colour: {r: 0.48235297, g: 0.50980395, b: 0.30588236, a: 1}
-    Height: 0.15
-  - Name: Grass Rock
-    Colour: {r: 0.4039216, g: 0.43529415, b: 0.2627451, a: 1}
-    Height: 0.35
-  - Name: Rock
-    Colour: {r: 0.35686275, g: 0.35686275, b: 0.35686275, a: 1}
-    Height: 0.55
-  - Name: Rock High
-    Colour: {r: 0.234, g: 0.234, b: 0.234, a: 1}
-    Height: 0.85
-  Octaves: 5
-  Persistance: 0.5
-  Lacunarity: 2
-  Scale: 100
-  ChunkSize: 20
-  TextureMultiplier: 1
-  ChanceToSpawnShip: 0.1
-  ViewDistanceMultiplier: 2
-  CurrentChunkPos: {x: 0, y: 0}
 --- !u!114 &2140971444
 MonoBehaviour:
   m_ObjectHideFlags: 0

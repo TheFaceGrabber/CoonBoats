@@ -10,6 +10,8 @@ public class WorldGenerator : MonoBehaviour
 {
     public static WorldGenerator Instance;
 
+    public GameObject ShipSpawnTest;
+
     public GameObject Land;
     public Material LandMaterial;
     public List<Region> Regions = new List<Region>();
@@ -47,7 +49,7 @@ public class WorldGenerator : MonoBehaviour
     private List<Chunk> _chunksvisiblelastUpdate = new List<Chunk>();
     private int ChunkViewDist;
 
-    public Vector2 CurrentChunkPos;
+    public Vector2 CurrentChunkPos { get; set; }
 
     void Awake()
     {
@@ -70,18 +72,19 @@ public class WorldGenerator : MonoBehaviour
 
     public void ShipSpawnPass(Vector2 coord)
     {
-        float minX = coord.x - ChunkSize / 2f;
-        float minY = coord.y - ChunkSize / 2f;
-        float maxX = coord.x + ChunkSize / 2f;
-        float maxY = coord.y + ChunkSize / 2f;
+        float minX = coord.x;// - ChunkSize / 2f;
+        float minY = coord.y;// - ChunkSize / 2f;
+        float maxX = coord.x;// + ChunkSize / 2f;
+        float maxY = coord.y;// + ChunkSize / 2f;
 
         float x = UnityEngine.Random.Range(minX, maxX);
         float y = UnityEngine.Random.Range(minY, maxY);
-        int r = UnityEngine.Random.Range(1, 100);
+        float r = UnityEngine.Random.Range(0f, 100f);
+
         if (r <= ChanceToSpawnShip)
         {
             Debug.Log("Spawned");
-            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            GameObject go = Instantiate<GameObject>(ShipSpawnTest, new Vector3(x, y), Quaternion.identity);
             go.transform.position = new Vector3(x,y,1);
         }
     }

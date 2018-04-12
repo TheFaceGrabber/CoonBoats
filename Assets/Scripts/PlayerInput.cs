@@ -22,12 +22,12 @@ public class PlayerInput : MonoBehaviour
 
             if (UserInput.GetInput("Forwards"))
             {
-                Ship.AddSpeed(Ship.GetSpeed() < 100 ? 1 : 0);
+                Ship.AddSpeed(Ship.GetSpeed() < 100 ? 20 * Time.deltaTime : 0);
             }
 
             if (UserInput.GetInput("Backwards"))
             {
-                Ship.AddSpeed(Ship.GetSpeed() > 0 ? -1 : 0);
+                Ship.AddSpeed(Ship.GetSpeed() > 0 ? -20 * Time.deltaTime : 0);
             }
         }
 

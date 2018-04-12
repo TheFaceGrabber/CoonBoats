@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class ShipController : MonoBehaviour
 {
+    public const int MAXLEVEL = 100;
+
+    [Header("Ship Stats")] public int ShipLevel;
+    
     float Angle;
-    [SerializeField]
-    private float speedFactor = 2f;
+    public float speedFactor = 2f;
     [SerializeField]
     private float Speed;
     
@@ -50,9 +53,14 @@ public class ShipController : MonoBehaviour
         RightSideCannon.CannonPoints = CannonPointsRight;
 		RightSideCannon.isActived = true;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    public static float AngleDir(Vector2 A, Vector2 B)
+    {
+        return -A.x * B.y + A.y * B.x;
+    }
+
+    // Update is called once per frame
+    void Update ()
 	{
 	    CheckBeached();
         
